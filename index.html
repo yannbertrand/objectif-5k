@@ -664,6 +664,99 @@
         font-weight: 500;
       }
 
+      /* PROGRESS BAR */
+      .progress-wrap {
+        margin-top: 1.75rem;
+        position: relative;
+        z-index: 1;
+      }
+      .progress-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .progress-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .progress-stat {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--teal);
+        letter-spacing: 0.02em;
+      }
+      .progress-stat span {
+        font-size: 0.85rem;
+        font-weight: 400;
+        color: var(--muted);
+        font-family: 'DM Sans', sans-serif;
+      }
+      .progress-track {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: var(--teal);
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+      }
+      .progress-fill::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--teal);
+        box-shadow: 0 0 8px rgba(62, 207, 150, 0.6);
+      }
+      .progress-segments {
+        display: flex;
+        margin-top: 8px;
+        gap: 2px;
+      }
+      .progress-seg {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.06);
+        transition: background 0.3s;
+        cursor: default;
+      }
+      .progress-seg.done {
+        background: var(--teal);
+        opacity: 0.6;
+      }
+      .progress-seg.done-full {
+        background: var(--teal);
+        opacity: 1;
+      }
+      .progress-seg-labels {
+        display: flex;
+        margin-top: 5px;
+      }
+      .progress-seg-label {
+        flex: 1;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        text-align: center;
+        opacity: 0.5;
+      }
+
       /* RESPONSIVE */
       @media (max-width: 600px) {
         .content {
@@ -703,6 +796,7 @@
         <span class="hero-badge">3 phases</span>
         <span class="hero-badge hot">Compétition — 21 juin</span>
       </div>
+      <div class="progress-wrap" id="global-progress"></div>
     </div>
 
     <nav class="nav">
@@ -1269,6 +1363,45 @@
 
       rws();
       rw(1);
+
+      function renderProgress() {
+        const allSessions = W.flatMap((w) => w.sessions);
+        const total = allSessions.length;
+        const done = allSessions.filter((s) => s.done).length;
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+        const segs = W.map((w) => {
+          const t = w.sessions.length;
+          const d = w.sessions.filter((s) => s.done).length;
+          return { n: w.n, total: t, done: d, full: d === t };
+        });
+
+        const el = document.getElementById('global-progress');
+        el.innerHTML = `
+      <div class="progress-header">
+        <span class="progress-label">Progression globale</span>
+        <span class="progress-stat">${done}<span> / ${total} séances complétées &nbsp;·&nbsp; ${pct}%</span></span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-segments">
+        ${segs
+          .map((s) => {
+            let cls = '';
+            if (s.done === s.total && s.total > 0) cls = 'done-full';
+            else if (s.done > 0) cls = 'done';
+            return `<div class="progress-seg ${cls}" title="Sem. ${s.n} — ${s.done}/${s.total}"></div>`;
+          })
+          .join('')}
+      </div>
+      <div class="progress-seg-labels">
+        ${segs.map((s) => `<span class="progress-seg-label">S${s.n}</span>`).join('')}
+      </div>
+    `;
+      }
+
+      renderProgress();
     </script>
   </body>
 </html>
