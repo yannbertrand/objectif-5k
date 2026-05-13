@@ -1322,7 +1322,7 @@
         cle: { l: 'Séance clé', c: 't-cle' },
       };
 
-      let cw = 1;
+      let cw = 2;
 
       function rws() {
         const sel = document.getElementById('ws');
@@ -1366,7 +1366,7 @@
       }
 
       rws();
-      rw(2);
+      rw(cw);
 
       function renderProgress() {
         const allSessions = W.flatMap((w) => w.sessions);
