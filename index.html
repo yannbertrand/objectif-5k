@@ -502,6 +502,11 @@
         transition: all 0.15s;
         letter-spacing: 0.02em;
       }
+      .wb.wb-done {
+        opacity: 0.55;
+        border-color: var(--teal-border);
+        background: var(--teal-bg);
+      }
       .wb:hover {
         color: var(--text);
         border-color: var(--border2);
@@ -1322,13 +1327,14 @@
         cle: { l: 'Séance clé', c: 't-cle' },
       };
 
-      let cw = 2;
+      const currentWeek = 2;
+      let cw = currentWeek;
 
       function rws() {
         const sel = document.getElementById('ws');
         sel.innerHTML = W.map((w) => {
           const p = PM[w.p];
-          return `<button class="wb ${p.cls}${w.n === cw ? ' on' : ''}" onclick="selw(${w.n})" title="${w.label}">S${w.n}</button>`;
+          return `<button class="wb ${p.cls}${w.n < currentWeek ? ' wb-done' : ''}${w.n === cw ? ' on' : ''}" onclick="selw(${w.n})" title="${w.label}">S${w.n}</button>`;
         }).join('');
       }
 
@@ -1366,7 +1372,7 @@
       }
 
       rws();
-      rw(cw);
+      rw(currentWeek);
 
       function renderProgress() {
         const allSessions = W.flatMap((w) => w.sessions);
